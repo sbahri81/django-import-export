@@ -202,10 +202,10 @@ class ForeignKeyWidget(Widget):
     def clean(self, value):
         # val = super(ForeignKeyWidget, self).clean(value)
         # return self.model.objects.get(**{self.field: val}) if val else None
-        pk = super(ForeignKeyWidget, self).clean(value)
-        if pk:
-            # Create a cache key from the app label, model name, and pk
-            cache_key = self.cache_key(pk)
+        val = super(ForeignKeyWidget, self).clean(value)
+        if val:
+            # Create a cache key from the app label, model name, and val
+            cache_key = self.cache_key(val)
 
             obj = cache.get(cache_key)
 
@@ -214,12 +214,12 @@ class ForeignKeyWidget(Widget):
                 return obj
 
             try:
-                # pk = int(pk)
+                # val = int(val)
                 # look up the object if it's not there and set it in the cache
-                obj = self.model.objects.get(pk=pk)
+                obj = self.model.objects.get(**{self.field: val})
 
             except ObjectDoesNotExist:
-                print 'DNE', pk
+                print 'DNE', val
 
             cache.set(cache_key, obj)
             # return our object
@@ -232,11 +232,11 @@ class ForeignKeyWidget(Widget):
             return ""
         return getattr(value, self.field)
 
-    def cache_key(self, pk):
+    def cache_key(self, val):
         return '%s_%s_%s' % (
             self.model._meta.app_label,
             self.model._meta.module_name,
-            pk.replace(" ", "")
+            val.replace(" ", "")
         )
 
 
