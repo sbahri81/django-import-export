@@ -214,7 +214,6 @@ class ForeignKeyWidget(Widget):
                 return obj
 
             try:
-                # val = int(val)
                 # look up the object if it's not there and set it in the cache
                 obj = self.model.objects.get(**{self.field: val})
 
